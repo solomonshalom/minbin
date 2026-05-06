@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@fastify/rate-limit": "^10.3.0",
-        "@fastify/static": "^8.0.4",
+        "@fastify/static": "^9.1.3",
         "@fastify/swagger": "^9.4.0",
         "animejs": "^4.4.1",
         "dotenv": "^16.4.5",
