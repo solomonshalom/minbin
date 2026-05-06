@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+.envrc
+
+# Cursor
+.cursorignore
+.cursorindexingignore
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+.cache
+.parcel-cache
