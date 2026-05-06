@@ -50,3 +50,6 @@ coverage/
 *.pid.lock
 .cache
 .parcel-cache
+
+# Claude Code local state
+.claude/

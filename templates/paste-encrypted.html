@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>minbin – encrypted paste</title>
+    <meta name="description" content="An end-to-end encrypted paste. The server cannot read this content.">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <!-- Strict CSP: same-origin only, no inline scripts, no third-party CDNs.
+         All visual chrome and crypto modules are vendored under /assets/.
+         Argon2 (hash-wasm) requires `'wasm-unsafe-eval'`.
+         frame-ancestors is set in the response header (it has no effect
+         via <meta>). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicons/apple-touch.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/light/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/dark/favicon-96x96.png" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap.min.css" integrity="{{ sri['bootstrap.min.css'] }}" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/Geist%20Mono.css">
+    <link rel="stylesheet" href="/assets/css/Inter.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+
+    <script src="/assets/js/theme.js" defer></script>
+    <script src="/assets/vendor/qrcode.min.js" integrity="{{ sri['qrcode.min.js'] }}" crossorigin="anonymous" defer></script>
+    <script src="/assets/vendor/confetti.browser.min.js" integrity="{{ sri['confetti.browser.min.js'] }}" crossorigin="anonymous" defer></script>
+    <script src="/assets/vendor/argon2.umd.min.js" integrity="{{ sri['argon2.umd.min.js'] }}" crossorigin="anonymous" defer></script>
+    <script src="/assets/js/minbin-crypto.js" defer></script>
+    <script src="/assets/js/paste-encrypted.js" defer></script>
+</head>
+
+<body style="min-height: 100vh;font-family: Inter, sans-serif;">
+    <section class="py-4 py-xl-5" style="min-height: 100vh;padding: 0px!important;">
+        <div class="container d-flex flex-column" style="max-width: 100%;min-height: 100vh;">
+            <!-- Toolbar: identical to the plaintext paste page so every shared
+                 link looks the same. expires-in + share + raw + new on the
+                 right, then theme/api/github. The encrypted/decrypted state
+                 is communicated by what fills the grey body shell below
+                 (locked → big "locked" prompt; decrypted → plaintext). -->
+            <div style="padding: 16px 32px!important;">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-2 d-flex justify-content-center align-items-center justify-content-sm-center justify-content-md-center justify-content-lg-start" style="padding-top: 8px;padding-bottom: 8px;">
+                        <a href="/" style="color: inherit;text-decoration: none;">
+                            <img class="img-fluid float-start logo-light" src="/assets/img/logo.webp" style="height: 24px;" alt="minbin">
+                            <img class="img-fluid float-start logo-dark" src="/assets/img/logo-dark.webp" style="height: 24px;" alt="minbin">
+                        </a>
+                    </div>
+                    <div class="col d-flex justify-content-center align-items-center justify-content-sm-center justify-content-md-end" style="padding-top: 8px;padding-bottom: 0px;">
+                        <div class="text-center d-flex float-md-end justify-content-center align-items-center flex-wrap" style="margin-top: 3px;margin-bottom: -3px;">
+                            <div class="d-flex justify-content-center align-items-center flex-sm-grow-1 flex-lg-grow-0 navbar-divider">
+                                <span style="font-size: 14px;font-family: 'Geist Mono', monospace;">expires in <span id="expiry-timer" data-seconds="{{ paste_expiry }}">00:00</span></span>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center flex-sm-grow-1 flex-lg-grow-0 navbar-divider">
+                                <button class="btn" type="button" style="min-width: 86px;height: 29px;margin-right: 8px;" data-bs-target="#share-modal" data-bs-toggle="modal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
+                                        <path d="M8.68387 13.3419C8.88616 12.9381 9 12.4824 9 12C9 11.5176 8.88616 11.0619 8.68387 10.6581M8.68387 13.3419C8.19134 14.3251 7.17449 15 6 15C4.34315 15 3 13.6569 3 12C3 10.3431 4.34315 9 6 9C7.17449 9 8.19134 9.67492 8.68387 10.6581M8.68387 13.3419L15.3161 16.6581M8.68387 10.6581L15.3161 7.34193M15.3161 7.34193C15.8087 8.32508 16.8255 9 18 9C19.6569 9 21 7.65685 21 6C21 4.34315 19.6569 3 18 3C16.3431 3 15 4.34315 15 6C15 6.48237 15.1138 6.93815 15.3161 7.34193ZM15.3161 16.6581C15.1138 17.0619 15 17.5176 15 18C15 19.6569 16.3431 21 18 21C19.6569 21 21 19.6569 21 18C21 16.3431 19.6569 15 18 15C16.8255 15 15.8087 15.6749 15.3161 16.6581Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>share
+                                </button>
+                                <a class="btn" href="/raw/{{ paste_id }}" role="button" style="min-width: 75px;height: 29px;margin-right: 8px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
+                                        <path d="M4 6H20M4 12H20M4 18H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>raw
+                                </a>
+                                <a class="btn" href="/" role="button" style="min-width: 75px;height: 29px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
+                                        <path d="M12 6V12M12 12V18M12 12H18M12 12L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>new
+                                </a>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center flex-sm-grow-1 flex-lg-grow-0" style="margin-bottom: 8px;height: 36px;margin-top: -5px;">
+                                <div class="theme-switcher dropdown" style="font-size: 12px;width: 42px;margin-right: 8px;">
+                                    <button class="btn btn-link" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="color: var(--bs-body-color);height: 29px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20" fill="none" class="mb-1" style="margin-top: 1px;font-size: 16px;">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C10.5523 2 11 2.44772 11 3V4C11 4.55228 10.5523 5 10 5C9.44772 5 9 4.55228 9 4V3C9 2.44772 9.44772 2 10 2ZM14 10C14 12.2091 12.2091 14 10 14C7.79086 14 6 12.2091 6 10C6 7.79086 7.79086 6 10 6C12.2091 6 14 7.79086 14 10ZM13.5356 14.9497L14.2427 15.6568C14.6332 16.0473 15.2664 16.0473 15.6569 15.6568C16.0474 15.2663 16.0474 14.6331 15.6569 14.2426L14.9498 13.5355C14.5593 13.145 13.9261 13.145 13.5356 13.5355C13.1451 13.926 13.1451 14.5592 13.5356 14.9497ZM15.6568 4.34309C16.0473 4.73362 16.0473 5.36678 15.6568 5.75731L14.9497 6.46441C14.5592 6.85494 13.926 6.85494 13.5355 6.46441C13.145 6.07389 13.145 5.44072 13.5355 5.0502L14.2426 4.34309C14.6331 3.95257 15.2663 3.95257 15.6568 4.34309ZM17 11C17.5523 11 18 10.5523 18 10C18 9.44772 17.5523 9 17 9H16C15.4477 9 15 9.44772 15 10C15 10.5523 15.4477 11 16 11H17ZM10 15C10.5523 15 11 15.4477 11 16V17C11 17.5523 10.5523 18 10 18C9.44772 18 9 17.5523 9 17V16C9 15.4477 9.44772 15 10 15ZM5.05031 6.46443C5.44083 6.85496 6.074 6.85496 6.46452 6.46443C6.85505 6.07391 6.85505 5.44074 6.46452 5.05022L5.75742 4.34311C5.36689 3.95259 4.73373 3.95259 4.3432 4.34311C3.95268 4.73363 3.95268 5.3668 4.3432 5.75732L5.05031 6.46443ZM6.46443 14.9497L5.75732 15.6568C5.3668 16.0473 4.73363 16.0473 4.34311 15.6568C3.95259 15.2663 3.95259 14.6331 4.34311 14.2426L5.05022 13.5355C5.44074 13.145 6.07391 13.145 6.46443 13.5355C6.85496 13.926 6.85496 14.5592 6.46443 14.9497ZM4 11C4.55228 11 5 10.5523 5 10C5 9.44772 4.55228 9 4 9H3C2.44772 9 2 9.44772 2 10C2 10.5523 2.44772 11 3 11H4Z" fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="dropdown-menu" style="border-radius: 0px;border: 1px solid var(--bs-border-color);font-size: 14px;margin-top: 8px;padding: 0px!important;">
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-theme-value="light" style="padding: 10px 12px;height: 42px;">light</a>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-theme-value="dark" style="padding: 10px 12px;height: 42px;">dark</a>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" data-bs-theme-value="auto" style="padding: 10px 12px;height: 42px;">auto</a>
+                                    </div>
+                                </div>
+                                <a class="btn" href="/openapi" role="button" style="margin-right: 8px;min-width: 69px;height: 29px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
+                                        <path d="M10 20L14 4M18 8L22 12L18 16M6 16L2 12L6 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>api
+                                </a>
+                                <a class="btn" href="https://github.com/solomonshalom/minbin" target="_blank" role="button" rel="noopener" style="min-width: 92px;height: 29px;">github</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden meta block: server-rendered hints. -->
+            <div id="paste-meta"
+                 data-paste-id="{{ paste_id }}"
+                 data-needs-password="{% if needs_password %}1{% else %}0{% endif %}"
+                 data-once="{% if once %}1{% else %}0{% endif %}"
+                 data-pubkey="{% if is_pubkey %}1{% else %}0{% endif %}"
+                 style="display:none"></div>
+
+            <!-- Single grey-box shell that flex-grows to fill the content area
+                 (matches 404.html). Pre-decrypt: shows centered status / locked
+                 prompt / error message inside. Post-decrypt: replaced by the
+                 textarea, which itself uses the .textarea class so the visual
+                 box stays seamless. -->
+            <div class="d-flex flex-column flex-grow-1" style="height: 100%;padding: 0px 32px!important;">
+                <div id="state-shell" class="d-flex flex-grow-1 justify-content-center align-items-center textarea" style="width: 100%;">
+                    <div style="width: 100%; max-width: 540px; text-align: center;">
+
+                        <!-- LOADING / GENERIC STATUS -->
+                        <div id="decrypt-status" role="status" aria-live="polite" style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--bs-secondary-color); min-height: 18px;"></div>
+
+                        <!-- ERROR -->
+                        <div id="decrypt-error" role="alert" style="display:none;">
+                            <h1 class="display-1" style="font-family: 'Geist Mono', monospace; font-weight: 200; margin-bottom: 8px;">!</h1>
+                            <p id="decrypt-error-text" style="font-size: 13px; color: var(--bs-secondary-color); margin: 0; max-width: 360px; margin-left: auto; margin-right: auto;"></p>
+                        </div>
+
+                        <!-- PASSWORD PROMPT -->
+                        <div id="password-prompt" style="display:none;">
+                            <h1 class="display-1" style="font-family: 'Geist Mono', monospace; font-weight: 200; letter-spacing: -0.01em; margin-bottom: 8px;">locked</h1>
+                            <p style="font-size: 13px; color: var(--bs-secondary-color); margin: 0 0 24px; max-width: 360px; margin-left: auto; margin-right: auto;">
+                                this paste is protected by a passphrase. enter it to decrypt.
+                            </p>
+
+                            <form id="password-form" autocomplete="off" novalidate>
+                                <!-- OTP-style chunked input -->
+                                <div id="otp-input" class="d-flex justify-content-center align-items-center" style="gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="0" aria-label="passphrase chunk 1 of 6" />
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="1" aria-label="passphrase chunk 2 of 6" />
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="2" aria-label="passphrase chunk 3 of 6" />
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="3" aria-label="passphrase chunk 4 of 6" />
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="4" aria-label="passphrase chunk 5 of 6" />
+                                    <input class="otp-cell shadow-none" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" maxlength="4" data-otp-index="5" aria-label="passphrase chunk 6 of 6" />
+                                </div>
+
+                                <!-- Custom-phrase fallback: a single wide bar
+                                     visually equivalent in footprint to the
+                                     6-cell row above. Same height + same total
+                                     width so toggling between modes feels like
+                                     a swap, not a layout shift. -->
+                                <div id="custom-phrase-wrap" class="d-none" style="margin-bottom: 14px;">
+                                    <input id="custom-phrase-input" type="password" autocomplete="current-password"
+                                           class="form-control shadow-none" placeholder="passphrase"
+                                           style="font-family: 'Geist Mono', monospace; font-size: 16px; letter-spacing: 0.04em; height: 52px; padding: 0 16px; width: 100%; max-width: 408px; margin: 0 auto; text-align: center; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color);" />
+                                </div>
+
+                                <div id="password-row-error" role="alert" style="display:none; font-size: 12px; color: #d4264a; font-family: 'Geist Mono', monospace; margin-bottom: 14px; min-height: 16px;"></div>
+
+                                <button id="password-submit" type="submit" class="btn" style="min-width: 110px; height: 32px; border-radius: 0;">decrypt</button>
+
+                                <div style="margin-top: 16px;">
+                                    <a href="#" id="toggle-custom-phrase" style="font-size: 12px; color: var(--bs-secondary-color); text-decoration: underline; cursor: pointer;">
+                                        use a custom phrase instead
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post-decrypt textarea: replaces the shell above. Same .textarea
+                     class so the box look stays consistent with the locked state. -->
+                <textarea id="paste-output"
+                          class="border shadow-none focus-ring z-0 flex-grow-1 scrollable custom-placeholder textarea"
+                          style="resize: none;font-family: 'Geist Mono', monospace;font-size: 14px; display: none;"
+                          readonly></textarea>
+            </div>
+
+            <style>
+                .otp-cell {
+                    width: 56px;
+                    height: 52px;
+                    text-align: center;
+                    font-family: 'Geist Mono', monospace;
+                    font-size: 17px;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    border: 1px solid var(--bs-border-color);
+                    border-radius: 0;
+                    background-color: var(--bs-body-bg);
+                    color: var(--bs-body-color);
+                    outline: none;
+                    transition: border-color 120ms ease-in-out;
+                }
+                .otp-cell:focus { border-color: var(--bs-emphasis-color, var(--bs-body-color)); }
+                .otp-cell.filled { border-color: var(--bs-emphasis-color, var(--bs-body-color)); }
+                @media (max-width: 540px) {
+                    .otp-cell { width: 44px; height: 44px; font-size: 15px; }
+                }
+            </style>
+
+            <div style="padding: 32px!important;">
+                <p class="footer-text" style="margin-bottom: 16px;font-size: 12px;color: rgba(33,37,41,0.5);">
+                    <span class="footer-text" style="font-weight: 500;color: rgb(33,37,41);">end-to-end encrypted.</span>
+                    the server cannot read this paste — decryption happens in your browser using a key from the URL fragment{% if needs_password %} and your password{% endif %}.
+                    learn more in the <a href="https://github.com/solomonshalom/minbin/blob/main/SECURITY.md" target="_blank" rel="noopener" style="color: inherit;">security docs</a>.
+                    <button type="button" class="btn-link" data-bs-target="#report-modal" data-bs-toggle="modal" style="background:none;border:none;padding:0;margin-left:6px;color:inherit;text-decoration:underline;font-size:12px;cursor:pointer;font-family:inherit;">report abuse</button>.
+                </p>
+                <p class="footer-text" style="margin-bottom: 0px;font-size: 12px;color: rgba(33,37,41,0.5);max-width: 1000px;">this service is provided as is, with no guarantees. pastes auto-delete after 1 hour. by using this service, you agree to these terms. minbin is licensed under the <a href="https://github.com/solomonshalom/minbin/blob/main/LICENSE" target="_blank" rel="noopener" style="color: inherit;">GNU General Public License v3.0</a>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Share modal: at body level (sibling of <section>), per Bootstrap's
+         documented pattern. Mounting it inside the flex container with
+         min-height: 100vh confused the modal backdrop and caused the
+         content to render inline. -->
+    <div class="modal fade" role="dialog" tabindex="-1" id="share-modal" style="border-style: none;border-radius: 0px;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: 0px!important;">
+                <div class="modal-body">
+                    <div class="d-flex flex-row align-items-start">
+                        <div class="modal-qr" style="margin-right: 16px;border: 1px solid var(--bs-border-color);height: 110px;width: 110px;flex-shrink: 0;">
+                            <div id="qrcode" style="padding: 8px; background: #fff;"></div>
+                        </div>
+                        <div class="flex-grow-1 d-flex flex-column justify-content-center" style="min-height: 110px;min-width: 0;">
+                            <p style="color: var(--bs-secondary-color); margin-bottom: 2px; font-size: 12px;">share link (includes decryption key — do not share publicly)</p>
+                            <p class="modal-url" id="share-text">
+                                loading…
+                                <button class="float-end copy-btn" type="button"
+                                        data-copy-value=""
+                                        data-target-id="share-text"
+                                        style="margin-top: 0px;margin-right: -6px;padding: 0px;border-radius: 0px;border-style: none;background: rgba(255,255,255,0);color: var(--bs-body-color);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="font-size: 16px;margin-right: 3px;">
+                                        <path d="M8 5H6C4.89543 5 4 5.89543 4 7V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V18M8 5C8 6.10457 8.89543 7 10 7H12C13.1046 7 14 6.10457 14 5M8 5C8 3.89543 8.89543 3 10 3H12C13.1046 3 14 3.89543 14 5M14 5H16C17.1046 5 18 5.89543 18 7V10M20 14H10M10 14L13 11M10 14L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "_report_modal.html" %}
+
+    <script src="/assets/vendor/bootstrap.bundle.min.js" integrity="{{ sri['bootstrap.bundle.min.js'] }}" crossorigin="anonymous" defer></script>
+</body>
+
+</html>

@@ -8,6 +8,7 @@
     <link rel="canonical" href="https://minb.in/">
     <meta property="og:url" content="https://minb.in/">
     <meta name="description" content="minbin is a minimal, privacy-focused pastebin service for sharing plain text or code. it's open source, fast, ephemeral, and without clutter.">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
     <script type="application/ld+json">
         {
             "@context": "http://schema.org",
@@ -16,87 +17,6 @@
             "url": "https://minb.in"
         }
     </script>
-    <script>
-        (function() {
-
-            // JavaScript snippet handling Dark/Light mode switching
-
-            const getStoredTheme = () => localStorage.getItem('theme');
-            const setStoredTheme = theme => localStorage.setItem('theme', theme);
-            const forcedTheme = document.documentElement.getAttribute('data-bss-forced-theme');
-
-            const getPreferredTheme = () => {
-
-                if (forcedTheme) return forcedTheme;
-
-                const storedTheme = getStoredTheme();
-                if (storedTheme) {
-                    return storedTheme;
-                }
-
-                const pageTheme = document.documentElement.getAttribute('data-bs-theme');
-
-                if (pageTheme) {
-                    return pageTheme;
-                }
-
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-
-            const setTheme = theme => {
-                if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark');
-                } else {
-                    document.documentElement.setAttribute('data-bs-theme', theme);
-                }
-            }
-
-            setTheme(getPreferredTheme());
-
-            const showActiveTheme = (theme, focus = false) => {
-                const themeSwitchers = [].slice.call(document.querySelectorAll('.theme-switcher'));
-
-                if (!themeSwitchers.length) return;
-
-                document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-                    element.classList.remove('active');
-                    element.setAttribute('aria-pressed', 'false');
-                });
-
-                for (const themeSwitcher of themeSwitchers) {
-
-                    const btnToActivate = themeSwitcher.querySelector('[data-bs-theme-value="' + theme + '"]');
-
-                    if (btnToActivate) {
-                        btnToActivate.classList.add('active');
-                        btnToActivate.setAttribute('aria-pressed', 'true');
-                    }
-                }
-            }
-
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                const storedTheme = getStoredTheme();
-                if (storedTheme !== 'light' && storedTheme !== 'dark') {
-                    setTheme(getPreferredTheme());
-                }
-            });
-
-            window.addEventListener('DOMContentLoaded', () => {
-                showActiveTheme(getPreferredTheme());
-
-                document.querySelectorAll('[data-bs-theme-value]')
-                    .forEach(toggle => {
-                        toggle.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            const theme = toggle.getAttribute('data-bs-theme-value');
-                            setStoredTheme(theme);
-                            setTheme(theme);
-                            showActiveTheme(theme);
-                        })
-                    })
-            });
-        })();
-    </script>
     <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicons/apple-touch.png?h=05ff78cd3f23f1833533b36470936c54">
     <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/light/favicon-96x96.png?h=aab7f6b1dff3f7a79389019ae79d6ed8">
     <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/dark/favicon-96x96.png?h=0959b8f09366580649dadcb086f1521d" media="(prefers-color-scheme: dark)">
@@ -104,11 +24,14 @@
     <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/dark/favicon-96x96.png?h=0959b8f09366580649dadcb086f1521d" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicons/apple-touch.png?h=05ff78cd3f23f1833533b36470936c54">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicons/light/web-app-manifest-192x192.png?h=cd241a4a369055fc8a06f0d829e0c25a">
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicons/light/web-app-manifest-512x512.png?h=cd241a4a369055fc8a06f0d829e0c25a">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap.min.css" integrity="{{ sri['bootstrap.min.css'] }}" crossorigin="anonymous">
     <link rel="stylesheet" href="/assets/css/Geist%20Mono.css?h=440f920163e3ecada6ef9ae34af744c0">
     <link rel="stylesheet" href="/assets/css/Inter.css?h=aca79172d1cb8d8dba9dfe13145e2f08">
     <link rel="stylesheet" href="/assets/css/styles.css?h=ce652bf0763ac26d525963e191726e2f">
+    <script src="/assets/js/theme.js" defer></script>
+    <script src="/assets/vendor/argon2.umd.min.js" integrity="{{ sri['argon2.umd.min.js'] }}" crossorigin="anonymous" defer></script>
+    <script src="/assets/js/minbin-crypto.js" defer></script>
+    <script src="/assets/js/index.js" defer></script>
 </head>
 
 <body style="min-height: 100vh;font-family: Inter, sans-serif;">
@@ -120,12 +43,12 @@
                         <div class="col-12 col-sm-12 col-md-3 col-lg-2 d-flex justify-content-center align-items-center justify-content-sm-center justify-content-md-center justify-content-lg-start" style="padding-top: 8px;padding-bottom: 8px;"><a href="/" style="color: inherit;text-decoration: none;"><img class="img-fluid float-start logo-light" src="/assets/img/logo.webp?h=da0d7aa077fd762d4d6cb7b11b426d98" style="height: 24px;" alt="minbin"><img class="img-fluid float-start logo-dark" src="/assets/img/logo-dark.webp?h=407f49ea880ff9a581f5b27f9411567b" style="height: 24px;" alt="minbin"></a></div>
                         <div class="col d-flex justify-content-center align-items-center justify-content-sm-center justify-content-md-end" style="padding-top: 8px;padding-bottom: 0px;">
                             <div class="text-center d-flex float-md-end justify-content-center align-items-center flex-wrap" style="margin-top: 3px;margin-bottom: -3px;">
-                                <!--
                                 <div class="d-flex justify-content-center align-items-center flex-sm-grow-1 flex-lg-grow-0 navbar-divider">
-                                    <div class="form-check form-switch"><input class="form-check-input shadow-none" type="checkbox" id="formCheck-1" style="margin-top: 6px;"><label class="form-check-label" for="formCheck-1" style="font-size: 14px;font-weight: 500;">one-time view</label></div>
-                                </div>
-                                -->
-                                <div class="d-flex justify-content-center align-items-center flex-sm-grow-1 flex-lg-grow-0 navbar-divider">
+                                    <button class="btn" id="options-button" type="button" data-bs-target="#options-modal" data-bs-toggle="modal" style="min-width: 95px;height: 29px;margin-right: 8px;" aria-label="paste options">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
+                                            <path d="M4 6H14M4 12H10M4 18H16M18 4V8M22 6H14M16 14H22M20 12V16M14 18H22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                        </svg>options<span id="options-active-dot" aria-hidden="true" style="display:none;width:6px;height:6px;border-radius:50%;background:#2fd588;margin-left:6px;vertical-align:middle;"></span>
+                                    </button>
                                     <button class="btn" id="paste-button" type="button" style="min-width: 85px;height: 29px;margin-right: 8px;">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
                                             <path d="M15.1716 7L8.58579 13.5858C7.80474 14.3668 7.80474 15.6332 8.58579 16.4142C9.36684 17.1953 10.6332 17.1953 11.4142 16.4142L17.8284 9.82843C19.3905 8.26633 19.3905 5.73367 17.8284 4.17157C16.2663 2.60948 13.7337 2.60948 12.1716 4.17157L5.75736 10.7574C3.41421 13.1005 3.41421 16.8995 5.75736 19.2426C8.1005 21.5858 11.8995 21.5858 14.2426 19.2426L20.5 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -163,12 +86,12 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <a class="btn" href="https://minb.in/openapi" role="button" style="margin-right: 8px;min-width: 69px;height: 29px;">
+                                    <a class="btn" href="/api" role="button" style="margin-right: 8px;min-width: 69px;height: 29px;">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
                                             <path d="M10 20L14 4M18 8L22 12L18 16M6 16L2 12L6 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                                         </svg>api
                                     </a>
-                                    <a class="btn" href="https://github.com/berrysauce/minbin" target="_blank" role="button" style="min-width: 92px;height: 29px;">
+                                    <a class="btn" href="https://github.com/solomonshalom/minbin" target="_blank" role="button" rel="noopener" style="min-width: 92px;height: 29px;">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 0 512 512" width="1em" height="1em" fill="currentColor" style="margin-top: -2px;font-size: 16px;margin-right: 6px;">
                                             <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc. -->
                                             <path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path>
@@ -180,57 +103,177 @@
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-grow-1" style="height: 100%;padding: 0px 32px!important;">
-                    <form class="d-flex flex-column flex-grow-1">
+                    <div id="submit-error" role="alert" style="display:none; margin-bottom: 8px; padding: 8px 12px; border: 1px solid #d4264a; color: #d4264a; font-family: 'Geist Mono', monospace; font-size: 13px;"></div>
+                    <div id="submit-status" role="status" aria-live="polite" style="margin-bottom: 4px; min-height: 18px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--bs-secondary-color);"></div>
+                    <div class="flex-grow-1 d-flex">
                         <textarea class="shadow-none focus-ring z-0 flex-grow-1 scrollable custom-placeholder textarea" id="paste-content" style="resize: none;font-family: 'Geist Mono', monospace;font-size: 14px;" placeholder="paste or type here..."></textarea>
-                    </form>
-                    <script>
-                        // handle paste button
+                    </div>
+                </div>
 
-                        const paste_button = document.getElementById("paste-button");
-                        const paste_textarea = document.getElementById("paste-content");
+                <!-- Options modal: encrypt / password / max-views / one-time / pubkey.
+                     Brand-matched styling -- 1px borders, no rounded corners,
+                     monospace labels, mirrors the share modal on the paste page.
+                     Uses Bootstrap CSS variables so it themes correctly in dark
+                     mode (descriptions inherit muted color, dividers match). -->
+                <div class="modal fade" role="dialog" tabindex="-1" id="options-modal" aria-labelledby="options-modal-title" style="border-style: none;border-radius: 0px;">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content" style="border-radius: 0px!important;">
+                            <div class="modal-body" style="padding: 20px 22px;">
+                                <p id="options-modal-title" style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 14px;">paste options</p>
 
-                        paste_button.addEventListener("click", async () => {
-                            try {
-                                const text = await navigator.clipboard.readText();
-                                paste_textarea.value = text;
-                            } catch (err) {
-                                console.error("Clipboard paste failed:", err);
-                            }
-                        });
-                    </script>
+                                <!-- encrypt row -->
+                                <div class="d-flex justify-content-between align-items-start" style="padding: 12px 0; border-top: 1px solid var(--bs-border-color);">
+                                    <label for="toggle-encrypt" style="cursor: pointer; flex: 1; margin-right: 16px;">
+                                        <div style="font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 500;">encrypt</div>
+                                        <div style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 2px; line-height: 1.4;">
+                                            end-to-end encrypted in your browser before upload. server stores ciphertext only.
+                                        </div>
+                                    </label>
+                                    <div class="form-check form-switch" style="margin: 0; padding-top: 2px;">
+                                        <input class="form-check-input shadow-none" type="checkbox" id="toggle-encrypt" checked role="switch">
+                                    </div>
+                                </div>
+
+                                <!-- password row -->
+                                <div class="d-flex justify-content-between align-items-start" style="padding: 12px 0; border-top: 1px solid var(--bs-border-color);">
+                                    <label for="toggle-password" style="cursor: pointer; flex: 1; margin-right: 16px;">
+                                        <div style="font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 500;">password</div>
+                                        <div style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 2px; line-height: 1.4;">
+                                            derive the key from a passphrase (Argon2id). recipient needs both the link and the password.
+                                        </div>
+                                    </label>
+                                    <div class="form-check form-switch" style="margin: 0; padding-top: 2px;">
+                                        <input class="form-check-input shadow-none" type="checkbox" id="toggle-password" role="switch">
+                                    </div>
+                                </div>
+                                <div id="password-input-wrap" style="display:none; padding: 0 0 12px 0;">
+                                    <div class="d-flex align-items-stretch" style="gap: 6px;">
+                                        <input id="password-input" type="text" autocomplete="off" spellcheck="false"
+                                               class="form-control shadow-none" placeholder="passphrase"
+                                               style="font-family: 'Geist Mono', monospace; font-size: 13px; letter-spacing: 0.05em; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                                        <button id="password-regenerate" type="button" class="btn shadow-none" title="regenerate passphrase" aria-label="regenerate passphrase"
+                                                style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 38px; padding: 0 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="font-size: 16px;">
+                                                <path d="M3 12a9 9 0 0 1 15.5-6.3M21 4v5h-5M21 12a9 9 0 0 1-15.5 6.3M3 20v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </button>
+                                        <button id="password-copy" type="button" class="btn shadow-none" title="copy passphrase" aria-label="copy passphrase"
+                                                style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 38px; padding: 0 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="font-size: 16px;">
+                                                <path d="M8 5H6C4.89543 5 4 5.89543 4 7V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V18M8 5C8 6.10457 8.89543 7 10 7H12C13.1046 7 14 6.10457 14 5M8 5C8 3.89543 8.89543 3 10 3H12C13.1046 3 14 3.89543 14 5M14 5H16C17.1046 5 18 5.89543 18 7V10M20 14H10M10 14L13 11M10 14L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--bs-tertiary-color); margin-top: 6px; line-height: 1.4;">
+                                        auto-generated, ~120 bits of entropy. share via a different channel than the link, or replace with your own.
+                                    </div>
+                                </div>
+
+                                <!-- send-to-pubkey row -->
+                                <div class="d-flex justify-content-between align-items-start" style="padding: 12px 0; border-top: 1px solid var(--bs-border-color);">
+                                    <label for="toggle-pubkey" style="cursor: pointer; flex: 1; margin-right: 16px;">
+                                        <div style="font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 500;">send to pubkey</div>
+                                        <div style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 2px; line-height: 1.4;">
+                                            encrypt to one or more recipients' X25519 public keys. only holders of the matching private keys can decrypt — even with the link.
+                                        </div>
+                                    </label>
+                                    <div class="form-check form-switch" style="margin: 0; padding-top: 2px;">
+                                        <input class="form-check-input shadow-none" type="checkbox" id="toggle-pubkey" role="switch">
+                                    </div>
+                                </div>
+                                <div id="pubkey-input-wrap" style="display:none; padding: 0 0 12px 0;">
+                                    <!-- recipient rows are appended here. The first row is rendered
+                                         on init by index.js so we don't ship empty UI when the toggle
+                                         opens. -->
+                                    <div id="pubkey-recipients" style="display:flex; flex-direction:column; gap:8px;"></div>
+                                    <div class="d-flex" style="gap: 6px; margin-top: 8px;">
+                                        <button id="pubkey-add-recipient" type="button" class="btn shadow-none"
+                                                style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 130px; height: 29px; font-size: 12px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px;font-size: 14px;margin-right: 4px;">
+                                                <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>add recipient
+                                        </button>
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--bs-tertiary-color); margin-top: 8px; line-height: 1.4;">
+                                        a per-paste content key is wrapped for each recipient using X25519 ECDH + HKDF + AES-GCM (Skiff §6.5). max 16.
+                                    </div>
+                                </div>
+
+                                <!-- max-views row -->
+                                <div class="d-flex justify-content-between align-items-start" style="padding: 12px 0; border-top: 1px solid var(--bs-border-color);">
+                                    <label for="toggle-max-views" style="cursor: pointer; flex: 1; margin-right: 16px;">
+                                        <div style="font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 500;">max views</div>
+                                        <div style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 2px; line-height: 1.4;">
+                                            self-destructs after a fixed number of successful decrypts. wrong-password attempts don't count.
+                                        </div>
+                                    </label>
+                                    <div class="form-check form-switch" style="margin: 0; padding-top: 2px;">
+                                        <input class="form-check-input shadow-none" type="checkbox" id="toggle-max-views" role="switch">
+                                    </div>
+                                </div>
+                                <div id="max-views-wrap" style="display:none; padding: 0 0 12px 0;">
+                                    <div class="d-flex align-items-stretch" style="gap: 6px;">
+                                        <input id="max-views-input" type="number" min="1" max="{{ max_access_count }}" value="5"
+                                               class="form-control shadow-none" placeholder="5"
+                                               style="font-family: 'Geist Mono', monospace; font-size: 13px; letter-spacing: 0.05em; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color); max-width: 120px;">
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--bs-tertiary-color); margin-top: 6px; line-height: 1.4;">
+                                        max {{ max_access_count }}. paired with the {{ paste_expiry or '60' }}-minute expiry — paste vanishes whichever comes first.
+                                    </div>
+                                </div>
+
+                                <!-- one-time row -->
+                                <div class="d-flex justify-content-between align-items-start" style="padding: 12px 0; border-top: 1px solid var(--bs-border-color); border-bottom: 1px solid var(--bs-border-color);">
+                                    <label for="toggle-once" style="cursor: pointer; flex: 1; margin-right: 16px;">
+                                        <div style="font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 500;">one-time</div>
+                                        <div style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 2px; line-height: 1.4;">
+                                            shorthand for max views = 1. disables max-views when on.
+                                        </div>
+                                    </label>
+                                    <div class="form-check form-switch" style="margin: 0; padding-top: 2px;">
+                                        <input class="form-check-input shadow-none" type="checkbox" id="toggle-once" role="switch">
+                                    </div>
+                                </div>
+
+                                <!-- identity section: your own pubkey for receiving pubkey-mode pastes. -->
+                                <div id="identity-section" style="padding: 16px 0 12px 0; border-bottom: 1px solid var(--bs-border-color);">
+                                    <div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 10px;">your identity</div>
+                                    <div style="font-size: 12px; color: var(--bs-secondary-color); margin-bottom: 10px; line-height: 1.4;">
+                                        share your pubkey out-of-band so others can send you pubkey-mode pastes. private key stays in this browser.
+                                    </div>
+                                    <div class="d-flex align-items-stretch" style="gap: 6px;">
+                                        <input id="identity-pubkey" type="text" readonly
+                                               class="form-control shadow-none" placeholder="(no identity yet)"
+                                               style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                                        <button id="identity-copy" type="button" class="btn shadow-none" title="copy your pubkey" aria-label="copy your pubkey" disabled
+                                                style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 38px; padding: 0 8px;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="font-size: 16px;">
+                                                <path d="M8 5H6C4.89543 5 4 5.89543 4 7V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V18M8 5C8 6.10457 8.89543 7 10 7H12C13.1046 7 14 6.10457 14 5M8 5C8 3.89543 8.89543 3 10 3H12C13.1046 3 14 3.89543 14 5M14 5H16C17.1046 5 18 5.89543 18 7V10M20 14H10M10 14L13 11M10 14L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div id="identity-fingerprint" style="font-size: 11px; color: var(--bs-tertiary-color); margin-top: 6px; line-height: 1.4; font-family: 'Geist Mono', monospace; min-height: 14px;">no identity yet — generate one to receive pubkey-mode pastes.</div>
+                                    <div class="d-flex" style="gap: 6px; margin-top: 10px;">
+                                        <button id="identity-generate" type="button" class="btn shadow-none" style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 110px; height: 29px; font-size: 12px;">generate</button>
+                                        <button id="identity-reset" type="button" class="btn shadow-none" disabled style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 75px; height: 29px; font-size: 12px;">reset</button>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end" style="margin-top: 18px;">
+                                    <button type="button" class="btn" data-bs-dismiss="modal" style="min-width: 75px;height: 29px;">done</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div style="padding: 32px!important;">
-                    <p class="footer-text" style="margin-bottom: 16px;font-size: 12px;color: rgba(33,37,41,0.5);"><span class="footer-text" style="font-weight: 500;color: rgb(33,37,41);">minbin is a minimal, ephemeral pastebin service.</span>&nbsp;created by&nbsp;<a href="https://berrysauce.dev/?ref=minbin" style="color: inherit;" target="_blank">berrysauce</a>.<span class="float-lg-end footer-text" style="font-weight: 500;color: rgb(33,37,41);"><img class="img-fluid" src="/assets/img/eu.webp?h=a722428543558d4a0580ae0befc34ecd" alt="eu" style="height: 16px;margin-top: -3px;margin-right: 8px;margin-left: 6px;">made and hosted in europe.</span></p>
-                    <p class="footer-text" style="margin-bottom: 0px;font-size: 12px;color: rgba(33,37,41,0.5);max-width: 1000px;">this service is provided as is, with no guarantees. do not use it to store illegal, sensitive, personal, or confidential information. the operator is not responsible for user-submitted content. no personal data is collected. pastes are anonymous and auto-delete after 1 hour. by using this service, you agree to these terms. minbin is licensed under the <a href="https://github.com/berrysauce/minbin/blob/main/LICENSE" target="_blank" style="color: inherit;">GNU General Public License v3.0</a>.</p>
+                    <p class="footer-text" style="margin-bottom: 16px;font-size: 12px;color: rgba(33,37,41,0.5);"><span class="footer-text" style="font-weight: 500;color: rgb(33,37,41);">minbin is a minimal, ephemeral pastebin service.</span><span class="float-lg-end footer-text" style="font-weight: 500;color: rgb(33,37,41);"><img class="img-fluid" src="/assets/img/eu.webp?h=a722428543558d4a0580ae0befc34ecd" alt="eu" style="height: 16px;margin-top: -3px;margin-right: 8px;margin-left: 6px;">made and hosted in europe.</span></p>
+                    <p class="footer-text" style="margin-bottom: 0px;font-size: 12px;color: rgba(33,37,41,0.5);max-width: 1000px;">this service is provided as is, with no guarantees. do not use it to store illegal, sensitive, personal, or confidential information. the operator is not responsible for user-submitted content. no personal data is collected. pastes are anonymous and auto-delete after 1 hour. by using this service, you agree to these terms. minbin is licensed under the <a href="https://github.com/solomonshalom/minbin/blob/main/LICENSE" target="_blank" style="color: inherit;">GNU General Public License v3.0</a>.</p>
                 </div>
             </div>
         </form>
-        <script>
-            // handle form submission
-
-            document.addEventListener("DOMContentLoaded", () => {
-                document.getElementById("main-form").addEventListener("submit", async (e) => {
-                    e.preventDefault();
-                    const text = document.getElementById("paste-content").value;
-
-                    const response = await fetch("/?relative=true", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "text/plain",
-                        },
-                        body: text,
-                    });
-
-                    if (response.status == 201) {
-                        // http success (created)
-                        const result = await response.text();
-                        window.location.replace("/" + result.trim() + "?party=1");
-                    }
-                });
-            });
-        </script>
     </section>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/bootstrap.bundle.min.js" integrity="{{ sri['bootstrap.bundle.min.js'] }}" crossorigin="anonymous" defer></script>
 </body>
 
 </html>

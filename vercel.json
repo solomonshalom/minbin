@@ -11,5 +11,13 @@
             "maxDuration": 10,
             "includeFiles": "{templates,dist}/**"
         }
+    },
+    "env": {
+        "TRUST_PROXY": "true"
+    },
+    "build": {
+        "env": {
+            "TRUST_PROXY": "true"
+        }
     }
 }

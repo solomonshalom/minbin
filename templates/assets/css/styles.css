@@ -224,6 +224,7 @@ p.modal-url {
   padding: 6px 12px;
   margin-bottom: 18px;
   font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 [data-bs-theme=dark] p.modal-url {

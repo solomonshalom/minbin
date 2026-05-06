@@ -1,0 +1,54 @@
+<!--
+    Report-abuse modal. Included by paste.html and paste-encrypted.html.
+    Brand-matched: 1px borders, no rounded corners, Geist Mono labels,
+    Bootstrap CSS variables for dark-mode support.
+
+    paste.js / paste-encrypted.js wire the form submission to POST /report.
+    `paste_id` is read from #paste-meta[data-paste-id] (server-rendered).
+-->
+<div class="modal fade" role="dialog" tabindex="-1" id="report-modal" aria-labelledby="report-modal-title" style="border-style: none;border-radius: 0px;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 0px!important;">
+            <div class="modal-body" style="padding: 20px 22px;">
+                <p id="report-modal-title" style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 14px;">report abuse</p>
+
+                <div style="font-size: 12px; color: var(--bs-secondary-color); margin-bottom: 14px; line-height: 1.5;">
+                    encrypted pastes are opaque to the operator. for them to evaluate content, your report needs the full link (including the <code>#</code> fragment) — pre-filled below. the operator's contact email is <a href="mailto:{{ abuse_email }}" style="color: inherit;">{{ abuse_email }}</a>.
+                </div>
+
+                <form id="report-form" autocomplete="off">
+                    <div style="margin-bottom: 12px;">
+                        <label for="report-reason" style="display:block; font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 6px;">reason</label>
+                        <textarea id="report-reason" required minlength="10" maxlength="1000" rows="4"
+                                  class="form-control shadow-none"
+                                  placeholder="describe the abuse (phishing, malware, csam, etc.)"
+                                  style="font-family: 'Geist Mono', monospace; font-size: 13px; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color); resize: vertical;"></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <label for="report-contact" style="display:block; font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 6px;">contact (optional)</label>
+                        <input id="report-contact" type="text" maxlength="256"
+                               class="form-control shadow-none"
+                               placeholder="email or url, if you'd like a follow-up"
+                               style="font-family: 'Geist Mono', monospace; font-size: 13px; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                    </div>
+
+                    <div style="margin-bottom: 14px;">
+                        <label for="report-link" style="display:block; font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bs-secondary-color); margin-bottom: 6px;">link (with fragment)</label>
+                        <input id="report-link" type="text" maxlength="2048" readonly
+                               class="form-control shadow-none"
+                               style="font-family: 'Geist Mono', monospace; font-size: 12px; border-radius: 0; border: 1px solid var(--bs-border-color); background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                        <input id="report-paste-id" type="hidden" value="">
+                    </div>
+
+                    <div id="report-status" role="status" aria-live="polite" style="font-family: 'Geist Mono', monospace; font-size: 12px; min-height: 16px; margin-bottom: 12px; color: var(--bs-secondary-color);"></div>
+
+                    <div class="d-flex justify-content-end" style="gap: 8px;">
+                        <button type="button" class="btn shadow-none" data-bs-dismiss="modal" style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 75px; height: 29px; font-size: 12px;">cancel</button>
+                        <button id="report-submit" type="submit" class="btn shadow-none" style="border: 1px solid var(--bs-border-color); border-radius: 0; min-width: 95px; height: 29px; font-size: 12px;">submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>minbin – API documentation</title>
+    <link rel="canonical" href="https://minb.in/api">
+    <meta property="og:url" content="https://minb.in/api">
+    <meta name="description" content="API documentation for minbin – a minimal, ephemeral, end-to-end encrypted pastebin. Create, fetch, and burn pastes via simple HTTP requests.">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "WebSite",
+            "name": "minbin",
+            "url": "https://minb.in"
+        }
+    </script>
+    <script src="/assets/js/theme.js" defer></script>
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicons/apple-touch.png?h=05ff78cd3f23f1833533b36470936c54">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/light/favicon-96x96.png?h=aab7f6b1dff3f7a79389019ae79d6ed8">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/dark/favicon-96x96.png?h=0959b8f09366580649dadcb086f1521d" media="(prefers-color-scheme: dark)">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap.min.css" integrity="{{ sri['bootstrap.min.css'] }}" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/Geist%20Mono.css?h=440f920163e3ecada6ef9ae34af744c0">
+    <link rel="stylesheet" href="/assets/css/Inter.css?h=aca79172d1cb8d8dba9dfe13145e2f08">
+    <link rel="stylesheet" href="/assets/css/styles.css?h=ce652bf0763ac26d525963e191726e2f">
+    <style>
+        .api-docs h2 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            margin-top: 42px;
+            margin-bottom: 14px;
+            letter-spacing: -0.01em;
+        }
+        .api-docs h3 {
+            font-family: 'Geist Mono', monospace;
+            font-weight: 500;
+            font-size: 15px;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            letter-spacing: 0.02em;
+        }
+        .api-docs p { font-size: 14px; line-height: 1.6; }
+        .api-docs ul { font-size: 14px; line-height: 1.7; }
+        .api-docs a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+        .api-docs a:hover { text-decoration: none; }
+
+        .api-endpoint {
+            font-family: 'Geist Mono', monospace;
+            font-size: 13px;
+            padding: 14px 16px;
+            background: #1a1a1a;
+            color: rgb(231,231,231);
+            border: 1px solid rgb(7,7,7);
+            border-bottom-width: 3px;
+            border-radius: 0;
+            margin: 12px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .api-endpoint .verb-get { color: rgb(30,172,217); font-weight: 600; }
+        .api-endpoint .verb-post { color: rgb(43,221,60); font-weight: 600; }
+        .api-endpoint .host { color: rgb(118,118,118); }
+        .api-endpoint .query { color: rgb(247,206,0); }
+
+        .api-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+            margin: 8px 0 16px 0;
+            font-family: 'Inter', sans-serif;
+        }
+        .api-table th, .api-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--bs-border-color);
+            text-align: left;
+            vertical-align: top;
+        }
+        .api-table th {
+            font-family: 'Geist Mono', monospace;
+            font-weight: 500;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--bs-secondary-color);
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .api-table code {
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            color: var(--bs-body-color);
+            background: var(--bs-tertiary-bg);
+            padding: 1px 5px;
+            border-radius: 0;
+        }
+
+        .api-callout {
+            padding: 12px 16px;
+            border-left: 3px solid rgb(232,64,27);
+            font-size: 13px;
+            margin: 16px 0;
+            background: rgba(232,64,27,0.04);
+        }
+        .api-callout .label {
+            color: rgb(232,64,27);
+            font-weight: 600;
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .api-sidebar {
+            position: sticky;
+            top: 32px;
+        }
+        .api-sidebar a {
+            color: inherit;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .api-sidebar a:hover {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .api-sidebar svg {
+            margin-right: 8px;
+            color: var(--bs-secondary-color);
+        }
+        .api-sidebar ul li {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .api-sidebar .section-label {
+            font-family: 'Geist Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--bs-secondary-color);
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+
+        [data-bs-theme=dark] .api-endpoint {
+            background: rgb(10,10,10);
+            border: 1px solid rgb(45,45,45);
+            border-bottom-width: 3px;
+        }
+        [data-bs-theme=dark] .api-callout {
+            background: rgba(232,64,27,0.08);
+        }
+    </style>
+</head>
+
+<body style="min-height: 100vh; font-family: Inter, sans-serif;">
+    <section class="py-4 py-xl-5">
+        <div class="container" style="max-width: 100%;">
+            <!-- Minimal top bar: a single "back home" button on the right.
+                 The brand mark lives in the sidebar (above "on this page"). -->
+            <div style="padding: 16px 32px!important;">
+                <div class="d-flex justify-content-end align-items-center" style="padding-top: 8px;">
+                    <a class="btn" href="/" role="button" style="min-width: 110px; height: 29px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" style="margin-top: -2px; font-size: 16px; margin-right: 6px;">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>back home
+                    </a>
+                </div>
+            </div>
+
+            <div class="container" style="max-width: 920px; padding: 32px;">
+                <div class="row gx-5">
+                    <div class="col-md-4 text-start">
+                        <div class="api-sidebar">
+                            <a href="/" style="color: inherit; text-decoration: none; display: inline-block; margin-bottom: 8px;">
+                                <img class="img-fluid logo-light" src="/assets/img/logo.webp?h=da0d7aa077fd762d4d6cb7b11b426d98" style="height: 24px;" alt="minbin">
+                                <img class="img-fluid logo-dark" src="/assets/img/logo-dark.webp?h=407f49ea880ff9a581f5b27f9411567b" style="height: 24px;" alt="minbin">
+                            </a>
+                            <p class="section-label" style="margin-top: 14px;">on this page</p>
+                            <ul class="list-unstyled">
+                                <li><a href="#overview">overview</a></li>
+                                <li><a href="#quickstart">quickstart</a></li>
+                                <li><a href="#create">POST /</a></li>
+                                <li><a href="#fetch-html">GET /:id</a></li>
+                                <li><a href="#fetch-raw">GET /raw/:id</a></li>
+                                <li><a href="#burn">POST /:id/burn</a></li>
+                                <li><a href="#access">POST /:id/access</a></li>
+                                <li><a href="#captcha">GET /captcha</a></li>
+                                <li><a href="#report">POST /report</a></li>
+                                <li><a href="#openapi">GET /openapi</a></li>
+                                <li><a href="#encrypted">encrypted records</a></li>
+                                <li><a href="#errors">errors &amp; limits</a></li>
+                            </ul>
+
+                            <p class="section-label">links</p>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="https://github.com/solomonshalom/minbin" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-size: 16px;">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M7 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                            <path d="M7 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                            <path d="M17 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+                                            <path d="M7 8l0 8"></path>
+                                            <path d="M7 8a4 4 0 0 0 4 4h4"></path>
+                                        </svg>repository
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/openapi" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-size: 16px;">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+                                            <path d="M9 17l3 -3l-3 -3"></path>
+                                            <path d="M13 14h-3"></path>
+                                        </svg>openapi spec
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/solomonshalom/minbin/blob/main/SECURITY.md" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-size: 16px;">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3"></path>
+                                        </svg>security model
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/solomonshalom/minbin/blob/main/LICENSE" target="_blank">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-size: 16px;">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                            <path d="M7 20l10 0"></path>
+                                            <path d="M6 6l6 -1l6 1"></path>
+                                            <path d="M12 3l0 17"></path>
+                                            <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"></path>
+                                            <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"></path>
+                                        </svg>license (GPL-3.0)
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8 text-start api-docs">
+                        <p style="text-align: left;">
+                            <span class="fs-2" style="font-weight: 700; line-height: 1.0; font-family: 'Inter', sans-serif; letter-spacing: -0.02em;">minbin is a tiny pastebin you can use over plain HTTP.</span>
+                            <br><br>
+                            Pastes are stored in Redis and auto-delete after a fixed expiry. The web UI encrypts pastes in your browser before upload, but the API also accepts plaintext for terminal use (<code>curl</code>, scripts, CI). All endpoints are unauthenticated and rate-limited per IP and (for SRP endpoints) per paste ID — see <a href="https://github.com/solomonshalom/minbin/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a> for the exact caps.
+                        </p>
+
+                        <h2 id="overview">overview</h2>
+                        <p>The base URL is your deployment's domain. There are eight endpoints worth knowing:</p>
+                        <table class="api-table">
+                            <thead>
+                                <tr><th>method</th><th>path</th><th>purpose</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>POST</code></td><td><code>/</code></td><td>create a new paste</td></tr>
+                                <tr><td><code>GET</code></td><td><code>/:paste_id</code></td><td>view paste in the browser (HTML)</td></tr>
+                                <tr><td><code>GET</code></td><td><code>/raw/:paste_id</code></td><td>fetch raw paste content</td></tr>
+                                <tr><td><code>POST</code></td><td><code>/:paste_id/burn</code></td><td>delete an encrypted paste after decrypt</td></tr>
+                                <tr><td><code>POST</code></td><td><code>/:paste_id/access</code></td><td>bump the access counter (max-views)</td></tr>
+                                <tr><td><code>GET</code></td><td><code>/captcha</code></td><td>issue a proof-of-work captcha challenge</td></tr>
+                                <tr><td><code>POST</code></td><td><code>/report</code></td><td>submit an abuse report</td></tr>
+                                <tr><td><code>GET</code></td><td><code>/openapi</code></td><td>machine-readable OpenAPI spec</td></tr>
+                            </tbody>
+                        </table>
+
+                        <h2 id="quickstart">quickstart</h2>
+                        <p>The fastest way to create a paste – pipe text into <code>curl</code>:</p>
+                        <div class="api-endpoint"><span class="verb-post">POST</span>  <span class="host">https://</span>minb.in/
+$ curl --data-binary "hello from the terminal" https://minb.in/
+<span class="host">→</span> https://minb.in/a3f9</div>
+
+                        <p>Pass the URL it prints back, or fetch the body with <code>GET /raw/:id</code>:</p>
+                        <div class="api-endpoint"><span class="verb-get">GET</span>  <span class="host">https://</span>minb.in/raw/a3f9
+$ curl https://minb.in/raw/a3f9
+<span class="host">→</span> hello from the terminal</div>
+
+                        <h2 id="create">POST / – create a paste</h2>
+                        <p>Send the paste body as the request body. Any content type is accepted; it's read as raw bytes. The response is the paste URL (or the bare ID if <code>?relative</code> is set), with status <code>201</code>.</p>
+                        <h3>query parameters</h3>
+                        <table class="api-table">
+                            <thead><tr><th>name</th><th>type</th><th>description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>once</code></td>
+                                    <td>flag</td>
+                                    <td>If present (any value), the paste self-destructs after the first <code>GET /:id</code> or <code>GET /raw/:id</code>. Plaintext pastes only – encrypted pastes carry their own <code>once</code> flag inside the record (see <a href="#encrypted">encrypted records</a>).</td>
+                                </tr>
+                                <tr>
+                                    <td><code>relative</code></td>
+                                    <td>boolean</td>
+                                    <td>If <code>true</code>, the response is just the paste ID (e.g. <code>a3f9</code>) instead of the full URL.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>maxAccesses</code></td>
+                                    <td>integer 1..1000</td>
+                                    <td>Plaintext only. Auto-deletes after the Nth read of <code>GET /:id</code> or <code>GET /raw/:id</code>. Combine with the time expiry — paste vanishes whichever comes first. Encrypted pastes set this inside the JSON record.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p style="font-size: 13px; color: var(--bs-secondary-color);">
+                            When the deployment has <code>CAPTCHA_BITS &gt; 0</code>, plaintext POSTs require a solved proof-of-work token: <code>X-Captcha-Token: &lt;token&gt;</code> and <code>X-Captcha-Nonce: &lt;nonce&gt;</code>. See <a href="#captcha">GET /captcha</a> for details. Encrypted POSTs are exempt — the SRP+Argon2 cost already raises the per-paste work for an attacker.
+                        </p>
+
+                        <h3>examples</h3>
+                        <div class="api-endpoint"># plain string
+curl --data-binary "secrets are bad" https://minb.in/
+
+# from a file
+curl --data-binary @notes.txt https://minb.in/
+
+# self-destruct after first read
+curl --data-binary @notes.txt "https://minb.in/?once"
+
+# return the bare ID
+curl --data-binary "hi" "https://minb.in/?relative=true"</div>
+
+                        <div class="api-callout">
+                            <span class="label">heads-up</span>
+                            <span>Plaintext pastes are visible to the server operator. For private content use the web UI – it encrypts in your browser before upload (<a href="https://github.com/solomonshalom/minbin/blob/main/SECURITY.md" target="_blank">SECURITY.md</a>).</span>
+                        </div>
+
+                        <h2 id="fetch-html">GET /:paste_id – view in browser</h2>
+                        <p>Renders the paste in an HTML page suitable for sharing. For encrypted (v2) pastes this returns the decrypt shell – the actual decryption runs client-side using the key in the URL fragment. For plaintext pastes flagged <code>once</code>, the paste is deleted on this read.</p>
+                        <div class="api-endpoint"><span class="verb-get">GET</span>  <span class="host">https://</span>minb.in/a3f9</div>
+
+                        <h2 id="fetch-raw">GET /raw/:paste_id – fetch raw content</h2>
+                        <p>Returns the paste body as <code>text/plain</code> for plaintext pastes, or the encrypted record as <code>application/json</code> for v2 pastes. Designed for scripting.</p>
+                        <div class="api-endpoint"><span class="verb-get">GET</span>  <span class="host">https://</span>minb.in/raw/a3f9
+$ curl -s https://minb.in/raw/a3f9
+<span class="host">→</span> hello from the terminal</div>
+                        <p style="font-size: 13px; color: var(--bs-secondary-color);">For plaintext <code>once</code> pastes this endpoint also burns on read. Encrypted pastes are <strong>not</strong> deleted on raw fetch – the client must explicitly call <a href="#burn">POST /:id/burn</a> after a successful decrypt, otherwise a wrong password would destroy the paste.</p>
+
+                        <h2 id="burn">POST /:paste_id/burn – delete a paste</h2>
+                        <p>Idempotent delete. Returns <code>204 No Content</code> whether or not the paste existed. Used by the encrypted-paste client to clean up <code>once</code> pastes after decrypt; you can also call it manually to revoke a paste early.</p>
+                        <div class="api-endpoint"><span class="verb-post">POST</span> <span class="host">https://</span>minb.in/a3f9/burn
+$ curl -X POST https://minb.in/a3f9/burn -i
+<span class="host">→</span> HTTP/1.1 204 No Content</div>
+
+                        <h2 id="access">POST /:paste_id/access – bump the access counter</h2>
+                        <p>Encrypted-paste max-views counter. After a successful client-side decrypt, the client calls this; the server atomically increments the counter and deletes the paste once the cap (the record's <code>maxAccesses</code> field) is reached. Idempotent and safe to retry — a dropped network response can never accidentally re-burn a paste. For plaintext pastes the counter is server-driven on read and this endpoint is a no-op (still returns 200).</p>
+                        <div class="api-endpoint"><span class="verb-post">POST</span> <span class="host">https://</span>minb.in/a3f9b1c2/access
+$ curl -X POST https://minb.in/a3f9b1c2/access
+<span class="host">→</span> {"remaining": 3, "expired": false}</div>
+
+                        <h2 id="captcha">GET /captcha – proof-of-work captcha</h2>
+                        <p>Stateless hashcash-style captcha. The server hands you an opaque token + a difficulty in bits. Find a 64-bit nonce such that <code>SHA-256(rand_part_of_token || nonce_be64)</code> has at least <code>bits</code> leading zero bits, then submit on plaintext POST / via <code>X-Captcha-Token</code> + <code>X-Captcha-Nonce</code> headers (or <code>?captchaToken=&amp;captchaNonce=</code> query). When the deployment has <code>CAPTCHA_BITS=0</code> (the default in single-user installs) the endpoint still works and returns <code>bits=0</code>; the captcha is bypassed.</p>
+                        <div class="api-endpoint"><span class="verb-get">GET</span>  <span class="host">https://</span>minb.in/captcha
+$ curl -s https://minb.in/captcha
+<span class="host">→</span> {"token": "AaWzJ…","bits": 16, "expiresAt": 1714500000000}</div>
+                        <p style="font-size: 13px; color: var(--bs-secondary-color);">No third-party JS, no fingerprinting, no IP leak to a SaaS. Works for curl users with a small bash + python helper. The token has a TTL (<code>CAPTCHA_TTL_SECONDS</code>, default 300s) and is single-use (replay-protected via Redis).</p>
+
+                        <h2 id="report">POST /report – abuse report drop-box</h2>
+                        <p>Operator-facing abuse reporting. Reports are pushed onto a Redis list with TTL, drained by the operator (typically forwarded to <code>{{ abuse_email }}</code>). Encrypted pastes are opaque to the operator; include the full link (with the URL fragment, the <code>#k=…</code> bit) so they can evaluate content.</p>
+                        <div class="api-endpoint"><span class="verb-post">POST</span> <span class="host">https://</span>minb.in/report
+Content-Type: application/json
+
+{
+  "paste_id": "a3f9b1c2",
+  "reason":   "phishing — fake bank login",
+  "contact":  "you@example.com",
+  "link":     "https://minb.in/a3f9b1c2#k=…"
+}</div>
+
+                        <h2 id="openapi">GET /openapi – the spec</h2>
+                        <p>Returns the OpenAPI 3 document for this deployment. Useful for generating clients or feeding into Postman/Insomnia.</p>
+                        <div class="api-endpoint"><span class="verb-get">GET</span>  <span class="host">https://</span>minb.in/openapi</div>
+                        <p><a href="/openapi" target="_blank">→ open the live spec</a></p>
+
+                        <h2 id="encrypted">encrypted records</h2>
+                        <p>To submit an end-to-end encrypted paste from your own client, send a JSON record with <code>Content-Type: application/vnd.minbin.encrypted+json</code>. The server validates the record's shape and stores it verbatim; it cannot decrypt it. The full wire format, key derivation parameters, and threat model are documented in <a href="https://github.com/solomonshalom/minbin/blob/main/SECURITY.md" target="_blank">SECURITY.md</a>.</p>
+                        <p style="font-size: 13px; color: var(--bs-secondary-color);">In short: AES-256-GCM payload with a 12-byte IV, optionally wrapped by an Argon2id-derived key. The <code>once</code> flag lives inside the record (so a curious server can't lie about it), and the random 256-bit master key never leaves the browser – it travels in the URL fragment <code>#k=…</code>, which browsers don't send to servers.</p>
+
+                        <h2 id="errors">errors &amp; limits</h2>
+                        <table class="api-table">
+                            <thead><tr><th>status</th><th>when</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>400</code></td><td>Empty body, body over the size limit, or a malformed encrypted record.</td></tr>
+                                <tr><td><code>402</code></td><td>Daily per-IP byte budget exceeded (only when <code>DAILY_BYTE_BUDGET &gt; 0</code>). Honor the <code>Retry-After</code> header — it counts seconds to UTC midnight.</td></tr>
+                                <tr><td><code>404</code></td><td>The paste ID doesn't exist or has expired.</td></tr>
+                                <tr><td><code>403</code></td><td>Cross-origin request blocked: an <code>Origin</code> or <code>Sec-Fetch-Site</code> header inconsistent with <code>APP_DOMAIN</code> was present on a write.</td></tr>
+                                <tr><td><code>422</code></td><td>Query parameter validation failed, or the captcha was missing/rejected.</td></tr>
+                                <tr><td><code>429</code></td><td>Rate-limited. Per-IP and per-paste-ID buckets; honor the <code>Retry-After</code> header.</td></tr>
+                                <tr><td><code>500</code></td><td>Unexpected server error (and the only time you should retry blindly).</td></tr>
+                            </tbody>
+                        </table>
+                        <p>Two configurable limits matter: <code>MAX_PASTE_SIZE</code> (default {{ max_paste_size_mb }} MB) caps the request body, and <code>PASTE_EXPIRY</code> (default {{ paste_expiry_minutes }} minutes) is how long a paste lives in Redis. Both are set per deployment.</p>
+
+                        <ul class="list-inline" style="color: var(--bs-secondary-color); font-size: 13px; margin-top: 42px;">
+                            <li class="list-inline-item">© {{ current_year }}&nbsp;TS rewrite by <a href="https://github.com/solomonshalom" target="_blank" rel="noopener">solomonshalom</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="/assets/vendor/bootstrap.bundle.min.js" integrity="{{ sri['bootstrap.bundle.min.js'] }}" crossorigin="anonymous" defer></script>
+</body>
+
+</html>
